@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Inventario</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; margin: 0; padding: 15px; }
+    h2 { text-align: center; color: #333; margin-bottom: 15px; }
+    .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); border-left: 6px solid #ccc; transition: background 0.3s; }
+    .card.verificado { background: #e2f0d9; border-left-color: #388e3c; }
+    .title { font-weight: bold; font-size: 1.1em; color: #111; }
+    .code { font-size: 0.85em; color: #666; margin-bottom: 8px; }
+    .row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .input-group { display: flex; align-items: center; gap: 8px; }
+    input[type="number"] { width: 70px; padding: 6px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 1em; }
+    .checkbox-container { display: flex; align-items: center; gap: 5px; font-weight: bold; cursor: pointer; }
+    input[type="checkbox"] { width: 22px; height: 22px; }
+  </style>
+</head>
+<body>
+
+  <h2>📱 Inventario de Almacén</h2>
+  <div id="app">Cargando productos...</div>
+
+  <script>
+    // PEGA AQUÍ TU URL DE APPS SCRIPT
+    const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
+
+    async function cargarInventario() {
+      const res = await fetch(URL_API);
+      const data = await res.json();
+      const container = document.getElementById('app');
+      container.innerHTML = '';
+
+      data.forEach(item => {
+        const esVerificado = item.manojo === true || item.manojo === "TRUE";
+        const card = document.createElement('div');
+        card.className = `card ${esVerificado ? 'verificado' : ''}`;
+        card.id = `card-${item.fila}`;
+
+        card.innerHTML = `
+          <div class="code">Código: ${item.codigo} | Categoría: ${item.categoria}</div>
+          <div class="title">${item.producto}</div>
+          <div class="row">
+            <span>Stock Sistema: <b>${item.stockSistema}</b></span>
+            <div class="input-group">
+              <label>Físico:</label>
+              <input type="number" value="${item.stockAlmacen !== '' ? item.stockAlmacen : ''}" 
+                onchange="guardarStock(${item.fila}, this.value, '${item.producto}')">
+            </div>
+          </div>
+          <div class="row" style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 8px;">
+            <span>Variación: <b id="var-${item.fila}">${item.variacion}</b></span>
+            <label class="checkbox-container">
+              <input type="checkbox" ${esVerificado ? 'checked' : ''} 
+                onchange="confirmarVerificacion(this, ${item.fila}, '${item.producto}')">
+              Manojo
+            </label>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function guardarStock(fila, cantidad, nombre) {
+      if (cantidad === '') return;
+      if (!confirm(`¿Confirmas ingresar ${cantidad} unidades para:\n"${nombre}"?`)) return;
+
+      const res = await fetch(URL_API, {
+        method: 'POST',
+        body: JSON.stringify({ accion: "ACTUALIZAR_STOCK", fila: fila, stockAlmacen: cantidad })
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        document.getElementById(`var-${fila}`).innerText = data.variacion;
+      }
+    }
+
+    async function confirmarVerificacion(checkbox, fila, nombre) {
+      const checked = checkbox.checked;
+      const mensaje = checked 
+        ? `¿Confirmas marcar como verificado:\n"${nombre}"?`
+        : `¿Deseas desmarcar:\n"${nombre}"?`;
+
+      if (!confirm(mensaje)) {
+        checkbox.checked = !checked;
+        return;
+      }
+
+      const card = document.getElementById(`card-${fila}`);
+      if (checked) {
+        card.classList.add('verificado');
+      } else {
+        card.classList.remove('verificado');
+      }
+
+      await fetch(URL_API, {
+        method: 'POST',
+        body: JSON.stringify({ accion: "VERIFICAR", fila: fila, manojo: checked })
+      });
+    }
+
+    cargarInventario();
+  </script>
+</body>
+</html>
