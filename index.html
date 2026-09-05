@@ -4,19 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ajuste de Inventario - Mascotitas Felices</title>
-  
-  <!-- Configuración PWA para instalación en celulares -->
+
+  <!-- Enlace al archivo Manifest externo -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512">
+
+  <!-- Meta etiquetas para pantalla completa en móviles -->
   <meta name="theme-color" content="#0f172a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mascotitas">
-
-  <!-- Logo de Google Drive convertido a enlace directo de renderizado directo -->
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512">
-
-  <!-- Manifest generado para permitir la instalación -->
-  <link rel="manifest" href='data:application/json,{"name":"Mascotitas Felices Inventario","short_name":"Mascotitas","start_url":".","display":"standalone","background_color":"#f4f7f9","theme_color":"#0f172a","icons":[{"src":"https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512","sizes":"512x512","type":"image/png"}]}'>
 
   <style>
     :root {
@@ -44,7 +43,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Header Profesional con Logo */
     .header-brand {
       background: var(--card-bg);
       border-radius: 20px;
@@ -97,7 +95,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Buscador */
     .search-section {
       background: var(--card-bg);
       border-radius: 16px;
@@ -117,7 +114,6 @@
       font-weight: 500;
     }
 
-    /* Categorías */
     .chips-container {
       display: flex;
       gap: 8px;
@@ -150,7 +146,6 @@
       border-color: var(--primary-dark);
     }
 
-    /* Lista de Productos */
     .product-list { display: flex; flex-direction: column; gap: 12px; }
 
     .product-card {
@@ -279,7 +274,6 @@
     }
     input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-blue); }
 
-    /* Modal */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -322,7 +316,6 @@
     .btn-confirm { background: var(--accent-blue); color: white; }
     .btn-cancel { background: #f1f5f9; color: var(--text-dark); }
 
-    /* Toast Centrado */
     .toast-notification {
       position: fixed;
       top: 50%;
@@ -356,10 +349,9 @@
 </head>
 <body>
 
-  <!-- Header con enlace procesado directo de Google Drive -->
   <div class="header-brand">
     <div class="logo-container">
-      <img src="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512" alt="Mascotitas Felices" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616408.png'">
+      <img src="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512" alt="Mascotitas Felices">
     </div>
     <div class="header-titles">
       <span class="company-name">Mascotitas Felices</span>
@@ -367,24 +359,20 @@
     </div>
   </div>
 
-  <!-- Buscador -->
   <div class="search-section">
     <div class="search-input-group">
       <input type="text" id="txtBuscar" placeholder="🔍 Buscar producto o código..." oninput="aplicarFiltros()">
     </div>
   </div>
 
-  <!-- Categorías -->
   <div class="chips-container" id="chipsContainer">
     <div class="chip active" onclick="seleccionarCategoria('', this)">TODAS</div>
   </div>
 
-  <!-- Lista de Productos -->
   <div class="product-list" id="listaProductos">
     Cargando inventario...
   </div>
 
-  <!-- Modal -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-card">
       <div class="modal-icon">📦</div>
@@ -397,7 +385,6 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast-notification" id="toastNotification">
     ✓ GUARDADO CON ÉXITO
   </div>
@@ -622,11 +609,13 @@
       );
     }
 
-    // Registro de Service Worker para PWA
+    // Registro correcto de Service Worker desde el archivo sw.js
     if ('serviceWorker' in navigator) {
-      const swCode = `self.addEventListener('fetch', function(e) {});`;
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW Registrado correctamente'))
+          .catch(err => console.log('Error registrando SW', err));
+      });
     }
 
     cargarDatos();
