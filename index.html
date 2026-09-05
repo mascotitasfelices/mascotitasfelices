@@ -11,7 +11,7 @@
       --text-main: #2b313d;
       --text-muted: #838e9e;
       --border-color: #e4e8ee;
-      --success-green-bg: #abefb8; /* Verde más notable */
+      --success-green-bg: #abefb8;
       --success-green-border: #1e7e34;
       --badge-red: #d9534f;
     }
@@ -29,7 +29,7 @@
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .header h1 { font-size: 1.6em; margin: 0; }
 
-    /* Panel de Filtros */
+    /* Filtros */
     .filter-card {
       background: #fff;
       padding: 16px;
@@ -78,8 +78,8 @@
       transition: all 0.3s ease;
     }
 
-    /* Color de fondo verde más notable */
-    .product-item.contabilizado {
+    /* Color de fondo verde al GUARDAR STOCK FÍSICO */
+    .product-item.stock-guardado {
       border-left: 6px solid var(--success-green-border);
       background-color: var(--success-green-bg) !important;
     }
@@ -118,7 +118,7 @@
     .header-info .lbl { font-weight: bold; }
     .header-info .val { color: var(--primary-blue); font-weight: 600; }
 
-    /* Etiqueta roja "Manojo" junto al nombre */
+    /* Etiqueta roja "Manojo" */
     .badge-manojo {
       background-color: var(--badge-red);
       color: white;
@@ -150,7 +150,7 @@
     .detail-label { color: var(--text-muted); font-weight: 600; }
     .detail-value { font-weight: 500; text-align: right; }
 
-    /* Entrada de Stock Físico con Botón Guardar */
+    /* Entrada de Stock Físico */
     .stock-input-group {
       display: flex;
       align-items: center;
@@ -233,6 +233,29 @@
     
     .btn-confirm { background: var(--primary-blue); color: white; }
     .btn-cancel { background: #e4e8ee; color: var(--text-main); }
+
+    /* Alerta Toast "Guardado con éxito" */
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #28a745;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -278,8 +301,13 @@
     </div>
   </div>
 
+  <!-- Alerta Toast "Guardado" -->
+  <div class="toast-notification" id="toastNotification">
+    ✓ Guardado con éxito
+  </div>
+
   <script>
-    // REEMPLAZA CON TU URL DE DESPLIEGUE DE APPS SCRIPT
+    // PEGA AQUÍ TU URL DE APPS SCRIPT
     const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
     
     let productosGlobales = [];
@@ -300,9 +328,7 @@
       const select = document.getElementById('selectCategoria');
       select.innerHTML = '<option value="">Todas las categorías</option>';
       
-      // Extrae categorías y maneja vacíos
       const categorias = [...new Set(data.map(item => item.categoria ? item.categoria.toString().trim() : ""))];
-      
       let contieneSinCategoria = false;
 
       categorias.sort().forEach(cat => {
@@ -328,12 +354,14 @@
       }
 
       data.forEach(item => {
-        const verificado = item.manojo === true || item.manojo === "TRUE";
+        const verificadoManojo = item.manojo === true || item.manojo === "TRUE";
+        const tieneStockGuardado = item.stockAlmacen !== "" && item.stockAlmacen !== null && item.stockAlmacen !== undefined;
         const tieneCategoria = item.categoria && item.categoria.toString().trim() !== "";
         const catTexto = tieneCategoria ? item.categoria : "Sin Categoría";
 
         const div = document.createElement('div');
-        div.className = `product-item ${verificado ? 'contabilizado' : ''}`;
+        // Pinta VERDE solo si se guardó Stock Físico
+        div.className = `product-item ${tieneStockGuardado ? 'stock-guardado' : ''}`;
         div.id = `item-${item.fila}`;
 
         div.innerHTML = `
@@ -342,7 +370,7 @@
             <div class="header-info">
               <span class="lbl">Producto:</span>
               <span class="val">${item.producto}</span>
-              <span class="badge-manojo" id="badge-${item.fila}" style="display: ${verificado ? 'inline-block' : 'none'};">Manojo</span>
+              <span class="badge-manojo" id="badge-${item.fila}" style="display: ${verificadoManojo ? 'inline-block' : 'none'};">Manojo</span>
             </div>
           </div>
 
@@ -364,15 +392,16 @@
               <span class="detail-value" id="var-${item.fila}" style="font-weight:bold; color:var(--primary-blue);">${item.variacion}</span>
             </div>
 
-            <!-- Entrada de Stock con Botón Guardar -->
+            <!-- Entrada de Stock Físico con Botón -->
             <div class="stock-input-group">
               <span class="detail-label">Stock Físico:</span>
               <input type="number" id="input-stock-${item.fila}" value="${item.stockAlmacen !== '' ? item.stockAlmacen : ''}" placeholder="0">
               <button class="btn-save-stock" onclick="pedirConfirmacionStock(${item.fila}, '${item.producto}')">Guardar</button>
             </div>
 
+            <!-- Checkbox Manojo -->
             <div class="checkbox-action">
-              <input type="checkbox" id="chk-${item.fila}" ${verificado ? 'checked' : ''} 
+              <input type="checkbox" id="chk-${item.fila}" ${verificadoManojo ? 'checked' : ''} 
                 onclick="pedirConfirmacionVerificacion(this, ${item.fila}, '${item.producto}')">
               <span>Manojo</span>
             </div>
@@ -414,7 +443,7 @@
       renderizarLista(filtrados);
     }
 
-    /* Lógica del Modal */
+    /* Modal Interactivo */
     function abrirModal(titulo, cuerpo, callback) {
       document.getElementById('modalTitle').innerText = titulo;
       document.getElementById('modalBody').innerHTML = cuerpo;
@@ -430,7 +459,13 @@
       }
     }
 
-    /* Handlers con Modal */
+    function mostrarToast() {
+      const toast = document.getElementById('toastNotification');
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2000);
+    }
+
+    /* Acciones con Confirmación y Toast */
     function pedirConfirmacionStock(fila, nombre) {
       const cantidad = document.getElementById(`input-stock-${fila}`).value;
       if (cantidad === '') return;
@@ -447,6 +482,9 @@
             const data = await res.json();
             if (data.status === 'ok') {
               document.getElementById(`var-${fila}`).innerText = data.variacion;
+              // PINTAR DE VERDE ÚNICAMENTE AL GUARDAR STOCK FÍSICO
+              document.getElementById(`item-${fila}`).classList.add('stock-guardado');
+              mostrarToast();
             }
           }
         }
@@ -455,7 +493,7 @@
 
     function pedirConfirmacionVerificacion(checkbox, fila, nombre) {
       const checked = checkbox.checked;
-      checkbox.checked = !checked; // revertir temporalmente mientras confirma
+      checkbox.checked = !checked; // revertir mientras se confirma
 
       const mensaje = checked 
         ? `¿Confirmas marcar como verificado el producto:<br>"<b>${nombre}</b>"?` 
@@ -467,14 +505,12 @@
         async (confirmado) => {
           if (confirmado) {
             checkbox.checked = checked;
-            const itemCard = document.getElementById(`item-${fila}`);
             const badge = document.getElementById(`badge-${fila}`);
 
+            // Mostrar/Ocultar etiqueta roja Manojo (SIN CAMBIAR EL COLOR VERDE DE LA TARJETA)
             if (checked) {
-              itemCard.classList.add('contabilizado');
               badge.style.display = 'inline-block';
             } else {
-              itemCard.classList.remove('contabilizado');
               badge.style.display = 'none';
             }
 
@@ -482,6 +518,8 @@
               method: 'POST',
               body: JSON.stringify({ accion: "VERIFICAR", fila: fila, manojo: checked })
             });
+
+            mostrarToast();
           }
         }
       );
