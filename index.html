@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ajuste de Inventario - Mascotitas Felices</title>
 
-  <!-- Enlace al archivo Manifest externo -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512">
 
-  <!-- Meta etiquetas para pantalla completa en móviles -->
   <meta name="theme-color" content="#0f172a">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,9 +23,10 @@
       --text-muted: #64748b;
       --primary-dark: #0f172a;
       --brand-orange: #ff6b35;
-      --brand-teal: #00a896;
       --accent-blue: #0284c7;
       --badge-red: #ef4444;
+      --badge-orange: #f97316;
+      --badge-yellow: #eab308;
       --stock-green-bg: #dcfce7;
       --stock-green-border: #16a34a;
     }
@@ -39,7 +38,7 @@
       background-color: var(--bg-main);
       color: var(--text-dark);
       margin: 0;
-      padding: 16px 12px;
+      padding: 16px 12px 80px 12px;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -197,18 +196,21 @@
       text-transform: uppercase;
     }
 
-    .badge-manojo {
-      background-color: var(--badge-red);
-      color: white;
+    .badge-tag {
       font-size: 0.65em;
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 10px;
       text-transform: uppercase;
       display: inline-block;
-      margin-left: 6px;
+      margin-left: 4px;
       vertical-align: middle;
+      color: white;
     }
+
+    .badge-manojo { background-color: var(--badge-red); }
+    .badge-no-registrado { background-color: var(--badge-orange); }
+    .badge-observacion { background-color: var(--badge-yellow); color: #000; }
 
     .toggle-arrow {
       color: var(--text-muted);
@@ -264,16 +266,65 @@
       text-transform: uppercase;
     }
 
+    .checkboxes-wrapper {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
     .checkbox-action {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 6px;
       font-weight: 700;
-      font-size: 0.88em;
+      font-size: 0.85em;
     }
     input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-blue); }
 
+    /* Botón Flotante para crear nuevo */
+    .fab-new-product {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--brand-orange);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 22px;
+      font-size: 0.9em;
+      font-weight: 800;
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 900;
+      text-transform: uppercase;
+    }
+
+    /* Modal Formulario */
+    .form-group {
+      text-align: left;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.75em;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 0.9em;
+      outline: none;
+    }
+
+    /* Modal Generico */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -290,21 +341,13 @@
       background: #ffffff;
       border-radius: 24px;
       padding: 24px;
-      width: 85%;
-      max-width: 340px;
+      width: 88%;
+      max-width: 360px;
       text-align: center;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
-    .modal-icon {
-      width: 50px; height: 50px;
-      background: #f1f5f9;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4em; margin: 0 auto 12px auto;
-    }
-
-    .modal-title { font-weight: 800; font-size: 1.1em; margin-bottom: 8px; text-transform: uppercase; }
+    .modal-title { font-weight: 800; font-size: 1.1em; margin-bottom: 12px; text-transform: uppercase; }
     .modal-body { color: var(--text-muted); font-size: 0.9em; margin-bottom: 20px; line-height: 1.4; }
     .modal-actions { display: flex; gap: 10px; }
     
@@ -318,8 +361,7 @@
 
     .toast-notification {
       position: fixed;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
       background: rgba(15, 23, 42, 0.95);
       color: #ffffff;
@@ -329,22 +371,13 @@
       font-size: 0.9em;
       text-transform: uppercase;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0; visibility: hidden;
       transition: all 0.25s ease;
       z-index: 2000;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       backdrop-filter: blur(6px);
-      letter-spacing: 0.5px;
     }
 
-    .toast-notification.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translate(-50%, -50%) scale(1);
-    }
+    .toast-notification.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
   </style>
 </head>
 <body>
@@ -373,9 +406,39 @@
     Cargando inventario...
   </div>
 
+  <!-- Botón para registrar un producto nuevo -->
+  <button class="fab-new-product" onclick="abrirModalNuevoProducto()">+ NUEVO PRODUCTO</button>
+
+  <!-- Modal de Registro de Producto -->
+  <div class="modal-overlay" id="modalNuevoOverlay">
+    <div class="modal-card">
+      <div class="modal-title">REGISTRAR NUEVO</div>
+      <div class="form-group">
+        <label>Código Barcode:</label>
+        <input type="text" id="newCodigo" placeholder="Ej. 9810906008007">
+      </div>
+      <div class="form-group">
+        <label>Nombre del Producto:</label>
+        <input type="text" id="newNombre" placeholder="Ej. CAPA ALGODÓN ROJA">
+      </div>
+      <div class="form-group">
+        <label>Categoría:</label>
+        <input type="text" id="newCategoria" placeholder="Ej. CAPA ALGODÓN">
+      </div>
+      <div class="form-group">
+        <label>Stock Físico Encontrado:</label>
+        <input type="number" id="newStock" placeholder="0">
+      </div>
+      <div class="modal-actions" style="margin-top: 16px;">
+        <button class="btn-modal btn-cancel" onclick="cerrarModalNuevo()">CANCELAR</button>
+        <button class="btn-modal btn-confirm" onclick="guardarNuevoProducto()">GUARDAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmaciones General -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-card">
-      <div class="modal-icon">📦</div>
       <div class="modal-title" id="modalTitle">CONFIRMAR ACCIÓN</div>
       <div class="modal-body" id="modalBody">Mensaje de confirmación</div>
       <div class="modal-actions">
@@ -385,9 +448,7 @@
     </div>
   </div>
 
-  <div class="toast-notification" id="toastNotification">
-    ✓ GUARDADO CON ÉXITO
-  </div>
+  <div class="toast-notification" id="toastNotification">✓ GUARDADO CON ÉXITO</div>
 
   <script>
     const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
@@ -445,6 +506,9 @@
 
       data.forEach(item => {
         const verificadoManojo = item.manojo === true || item.manojo === "TRUE";
+        const tieneObservacion = item.observacion === true || item.observacion === "TRUE";
+        const esNoRegistrado = item.noRegistrado === true || item.noRegistrado === "TRUE";
+
         const tieneStockGuardado = item.stockAlmacen !== "" && item.stockAlmacen !== null && item.stockAlmacen !== undefined;
         const tieneCategoria = item.categoria && item.categoria.toString().trim() !== "";
         const catTexto = tieneCategoria ? item.categoria.toUpperCase() : "SIN CATEGORÍA";
@@ -459,7 +523,9 @@
               <div class="icon-circle">📦</div>
               <div>
                 <span class="product-name">${item.producto}</span>
-                <span class="badge-manojo" id="badge-${item.fila}" style="display: ${verificadoManojo ? 'inline-block' : 'none'};">MANOJO</span>
+                <span class="badge-tag badge-manojo" id="badge-manojo-${item.fila}" style="display: ${verificadoManojo ? 'inline-block' : 'none'};">MANOJO</span>
+                <span class="badge-tag badge-observacion" id="badge-obs-${item.fila}" style="display: ${tieneObservacion ? 'inline-block' : 'none'};">OBSERVACIÓN</span>
+                ${esNoRegistrado ? '<span class="badge-tag badge-no-registrado">NO REGISTRADO</span>' : ''}
               </div>
             </div>
             <div class="toggle-arrow" id="icon-${item.fila}">▼</div>
@@ -489,10 +555,17 @@
               <button class="btn-save-stock" onclick="pedirConfirmacionStock(${item.fila}, '${item.producto}')">GUARDAR</button>
             </div>
 
-            <div class="checkbox-action">
-              <input type="checkbox" id="chk-${item.fila}" ${verificadoManojo ? 'checked' : ''} 
-                onclick="pedirConfirmacionVerificacion(this, ${item.fila}, '${item.producto}')">
-              <span>MANOJO</span>
+            <div class="checkboxes-wrapper">
+              <div class="checkbox-action">
+                <input type="checkbox" id="chk-${item.fila}" ${verificadoManojo ? 'checked' : ''} 
+                  onclick="pedirConfirmacionVerificacion(this, ${item.fila}, '${item.producto}')">
+                <span>MANOJO</span>
+              </div>
+              <div class="checkbox-action">
+                <input type="checkbox" id="chk-obs-${item.fila}" ${tieneObservacion ? 'checked' : ''} 
+                  onclick="pedirConfirmacionObservacion(this, ${item.fila}, '${item.producto}')">
+                <span>OBSERVACIÓN</span>
+              </div>
             </div>
           </div>
         `;
@@ -546,6 +619,14 @@
       }
     }
 
+    function abrirModalNuevoProducto() {
+      document.getElementById('modalNuevoOverlay').classList.add('active');
+    }
+
+    function cerrarModalNuevo() {
+      document.getElementById('modalNuevoOverlay').classList.remove('active');
+    }
+
     function mostrarToast() {
       const toast = document.getElementById('toastNotification');
       toast.classList.add('show');
@@ -580,23 +661,13 @@
       const checked = checkbox.checked;
       checkbox.checked = !checked;
 
-      const mensaje = checked 
-        ? `¿Confirmas marcar como verificado el producto:<br>"<b>${nombre}</b>"?` 
-        : `¿Deseas desmarcar el producto:<br>"<b>${nombre}</b>"?`;
-
       abrirModal(
         "VERIFICACIÓN DE PRODUCTO",
-        mensaje,
+        checked ? `¿Marcar como MANOJO:<br>"<b>${nombre}</b>"?` : `¿Desmarcar MANOJO:<br>"<b>${nombre}</b>"?`,
         async (confirmado) => {
           if (confirmado) {
             checkbox.checked = checked;
-            const badge = document.getElementById(`badge-${fila}`);
-
-            if (checked) {
-              badge.style.display = 'inline-block';
-            } else {
-              badge.style.display = 'none';
-            }
+            document.getElementById(`badge-manojo-${fila}`).style.display = checked ? 'inline-block' : 'none';
 
             await fetch(URL_API, {
               method: 'POST',
@@ -609,12 +680,63 @@
       );
     }
 
-    // Registro correcto de Service Worker desde el archivo sw.js
+    function pedirConfirmacionObservacion(checkbox, fila, nombre) {
+      const checked = checkbox.checked;
+      checkbox.checked = !checked;
+
+      abrirModal(
+        "OBSERVACIÓN DE PRODUCTO",
+        checked ? `¿Marcar CON OBSERVACIÓN:<br>"<b>${nombre}</b>"?` : `¿Quitar OBSERVACIÓN:<br>"<b>${nombre}</b>"?`,
+        async (confirmado) => {
+          if (confirmado) {
+            checkbox.checked = checked;
+            document.getElementById(`badge-obs-${fila}`).style.display = checked ? 'inline-block' : 'none';
+
+            await fetch(URL_API, {
+              method: 'POST',
+              body: JSON.stringify({ accion: "OBSERVACION", fila: fila, observacion: checked })
+            });
+
+            mostrarToast();
+          }
+        }
+      );
+    }
+
+    async function guardarNuevoProducto() {
+      const codigo = document.getElementById('newCodigo').value.trim();
+      const producto = document.getElementById('newNombre').value.trim();
+      const categoria = document.getElementById('newCategoria').value.trim();
+      const stockFisico = document.getElementById('newStock').value;
+
+      if (!codigo || !producto) {
+        alert("El código y nombre del producto son requeridos.");
+        return;
+      }
+
+      cerrarModalNuevo();
+
+      const res = await fetch(URL_API, {
+        method: 'POST',
+        body: JSON.stringify({
+          accion: "CREAR_PRODUCTO",
+          codigo: codigo,
+          producto: producto,
+          categoria: categoria,
+          stockFisico: stockFisico
+        })
+      });
+
+      const data = await res.json();
+      if (data.status === 'ok') {
+        mostrarToast();
+        cargarDatos();
+      }
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('SW Registrado correctamente'))
-          .catch(err => console.log('Error registrando SW', err));
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
       });
     }
 
