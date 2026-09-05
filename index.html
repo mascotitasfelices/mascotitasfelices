@@ -6,167 +6,218 @@
   <title>Ajuste de Inventario</title>
   <style>
     :root {
-      --primary-blue: #0088ff;
-      --bg-color: #f7f9fc;
-      --text-main: #2b313d;
-      --text-muted: #838e9e;
-      --border-color: #e4e8ee;
-      --success-green-bg: #abefb8;
-      --success-green-border: #1e7e34;
+      --bg-main: #f2f4f7;
+      --card-bg: #ffffff;
+      --text-dark: #121826;
+      --text-muted: #6c727f;
+      --primary-dark: #0f2d2e;
+      --accent-blue: #007aff;
+      --accent-green: #28a745;
       --badge-red: #d9534f;
+      --stock-green-bg: #d1e7dd;
+      --stock-green-border: #198754;
     }
+
+    * { box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-dark);
       margin: 0;
-      padding: 16px;
+      padding: 16px 12px;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 4px; }
-    .breadcrumb span { color: var(--primary-blue); }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .header h1 { font-size: 1.6em; margin: 0; }
-
-    /* Filtros */
-    .filter-card {
-      background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      margin-bottom: 20px;
-    }
-
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.85em; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-    
-    input[type="text"], select, input[type="number"] {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 0.95em;
-      outline: none;
-      box-sizing: border-box;
-      background: #fff;
-    }
-
-    .btn-primary {
-      width: 100%;
-      background: var(--primary-blue);
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 25px;
-      font-weight: bold;
-      font-size: 0.95em;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 136, 255, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Lista Acordeón */
-    .product-list { display: flex; flex-direction: column; gap: 10px; }
-
-    .product-item {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    /* Color de fondo verde al GUARDAR STOCK FÍSICO */
-    .product-item.stock-guardado {
-      border-left: 6px solid var(--success-green-border);
-      background-color: var(--success-green-bg) !important;
-    }
-
-    .product-header {
+    /* Encabezado */
+    .header {
       display: flex;
       align-items: center;
-      padding: 12px 16px;
-      cursor: pointer;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 0 4px;
     }
 
-    .toggle-icon {
-      width: 28px;
-      height: 28px;
-      background: var(--primary-blue);
-      color: #fff;
+    .btn-back {
+      width: 38px;
+      height: 38px;
+      background: #ffffff;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8em;
-      margin-right: 12px;
-      flex-shrink: 0;
-      transition: transform 0.2s;
+      font-size: 1.1em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      cursor: pointer;
     }
 
-    .toggle-icon.open { transform: rotate(180deg); }
+    .header-title {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
 
-    .header-info { 
-      display: flex; 
+    /* Buscador y Filtro */
+    .search-section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      margin-bottom: 14px;
+    }
+
+    .search-input-group input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 0.95em;
+      background: transparent;
+      color: var(--text-dark);
+    }
+
+    /* Chips de Categorías (Scroll Horizontal) */
+    .chips-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .chips-container::-webkit-scrollbar { display: none; }
+
+    .chip {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+
+    .chip.active {
+      background: var(--primary-dark);
+      color: #ffffff;
+    }
+
+    /* Lista de Tarjetas */
+    .product-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .product-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      transition: background-color 0.3s ease;
+    }
+
+    /* Estado cuando se guarda el stock físico */
+    .product-card.stock-guardado {
+      background-color: var(--stock-green-bg) !important;
+      border: 1px solid var(--stock-green-border);
+    }
+
+    .card-main {
+      display: flex;
       align-items: center;
-      gap: 8px; 
-      font-size: 0.95em; 
-      flex-wrap: wrap;
+      justify-content: space-between;
+      cursor: pointer;
     }
-    .header-info .lbl { font-weight: bold; }
-    .header-info .val { color: var(--primary-blue); font-weight: 600; }
 
-    /* Etiqueta roja "Manojo" */
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      padding-right: 8px;
+    }
+
+    .icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #eef2f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 0.95em;
+      color: var(--text-dark);
+      line-height: 1.2;
+    }
+
     .badge-manojo {
       background-color: var(--badge-red);
       color: white;
-      font-size: 0.75em;
-      font-weight: bold;
-      padding: 2px 8px;
+      font-size: 0.65em;
+      font-weight: 700;
+      padding: 3px 8px;
       border-radius: 12px;
       text-transform: uppercase;
       display: inline-block;
-      margin-left: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
     }
 
+    .toggle-arrow {
+      color: var(--text-muted);
+      font-size: 0.8em;
+      transition: transform 0.2s;
+    }
+    .toggle-arrow.open { transform: rotate(180deg); }
+
+    /* Detalles Desplegables */
     .product-details {
       display: none;
-      padding: 0 16px 16px 56px;
-      border-top: 1px solid rgba(0,0,0,0.05);
-      margin-top: 4px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
     }
-
     .product-details.active { display: block; }
 
     .detail-row {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
-      font-size: 0.9em;
+      margin-bottom: 6px;
+      font-size: 0.85em;
     }
+    .detail-label { color: var(--text-muted); font-weight: 500; }
+    .detail-value { font-weight: 600; color: var(--text-dark); }
 
-    .detail-label { color: var(--text-muted); font-weight: 600; }
-    .detail-value { font-weight: 500; text-align: right; }
-
-    /* Entrada de Stock Físico */
+    /* Input Stock y Botón */
     .stock-input-group {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 10px;
+    }
+    .stock-input-group input {
+      width: 90px;
+      padding: 8px;
+      border: 1px solid #d0d5dd;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 0.9em;
+      outline: none;
+      background: #fff;
     }
 
-    .stock-input-group input { width: 80px; text-align: center; }
-
     .btn-save-stock {
-      background: var(--primary-blue);
+      background: var(--accent-blue);
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 600;
       font-size: 0.85em;
       cursor: pointer;
     }
@@ -175,115 +226,106 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 12px;
-      font-weight: bold;
-      color: var(--text-main);
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 0.9em;
     }
+    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-blue); }
 
-    input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary-blue); }
-
-    /* Modal Interactivo Centrado */
+    /* Modal de Confirmación Centrado */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.4);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(4px);
     }
-
     .modal-overlay.active { display: flex; }
 
     .modal-card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      width: 90%;
-      max-width: 380px;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 24px;
+      width: 85%;
+      max-width: 340px;
       text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      animation: popup 0.25s ease-out;
-    }
-
-    @keyframes popup {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
 
     .modal-icon {
       width: 50px; height: 50px;
-      background: #e6f3ff; color: var(--primary-blue);
+      background: #eef2f6;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.5em; margin: 0 auto 12px auto;
+      font-size: 1.4em; margin: 0 auto 12px auto;
     }
 
-    .modal-title { font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
+    .modal-title { font-weight: 700; font-size: 1.1em; margin-bottom: 8px; }
     .modal-body { color: var(--text-muted); font-size: 0.9em; margin-bottom: 20px; line-height: 1.4; }
-    .modal-body b { color: var(--text-main); }
-
     .modal-actions { display: flex; gap: 10px; }
     
     .btn-modal {
-      flex: 1; padding: 10px; border-radius: 8px;
-      font-weight: bold; border: none; cursor: pointer;
+      flex: 1; padding: 12px; border-radius: 16px;
+      font-weight: 700; border: none; cursor: pointer; font-size: 0.9em;
     }
-    
-    .btn-confirm { background: var(--primary-blue); color: white; }
-    .btn-cancel { background: #e4e8ee; color: var(--text-main); }
+    .btn-confirm { background: var(--accent-blue); color: white; }
+    .btn-cancel { background: #eef2f6; color: var(--text-dark); }
 
-    /* Alerta Toast "Guardado con éxito" */
+    /* Alerta Toast "Guardado con éxito" - CENTRADA EN PANTALLA */
     .toast-notification {
       position: fixed;
-      bottom: 20px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #28a745;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 25px;
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(15, 45, 46, 0.95);
+      color: #ffffff;
+      padding: 14px 28px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.95em;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
       z-index: 2000;
       display: flex;
       align-items: center;
       gap: 8px;
+      backdrop-filter: blur(6px);
     }
 
     .toast-notification.show {
-      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
     }
   </style>
 </head>
 <body>
 
-  <div class="breadcrumb">Home > <span>Ajuste de Inventario</span></div>
+  <!-- Encabezado Estilo App -->
   <div class="header">
-    <h1>Ajuste de Inventario</h1>
-    <span style="font-size: 1.2em; color: var(--primary-blue);">🔍</span>
+    <div class="btn-back">‹</div>
+    <div class="header-title">Ajuste de Inventario</div>
+    <div style="width: 38px;"></div>
   </div>
 
-  <!-- Filtros -->
-  <div class="filter-card">
-    <div class="form-group">
-      <label>Buscar Producto o Código</label>
-      <input type="text" id="txtBuscar" placeholder="Ej: CAPA ALGODON...">
+  <!-- Buscador -->
+  <div class="search-section">
+    <div class="search-input-group">
+      <input type="text" id="txtBuscar" placeholder="🔍 Buscar producto o código..." oninput="aplicarFiltros()">
     </div>
-    
-    <div class="form-group">
-      <label>Categoría</label>
-      <select id="selectCategoria">
-        <option value="">Todas las categorías</option>
-      </select>
-    </div>
-
-    <button class="btn-primary" onclick="aplicarFiltros()">CONFIRMAR FILTRO</button>
   </div>
 
-  <!-- Lista -->
+  <!-- Chips de Categorías (Carrusel Horizontal) -->
+  <div class="chips-container" id="chipsContainer">
+    <div class="chip active" onclick="seleccionarCategoria('', this)">Todas</div>
+  </div>
+
+  <!-- Lista de Productos -->
   <div class="product-list" id="listaProductos">
     Cargando inventario...
   </div>
@@ -301,7 +343,7 @@
     </div>
   </div>
 
-  <!-- Alerta Toast "Guardado" -->
+  <!-- Mensaje Flotante Guardado (Centrado) -->
   <div class="toast-notification" id="toastNotification">
     ✓ Guardado con éxito
   </div>
@@ -311,6 +353,7 @@
     const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
     
     let productosGlobales = [];
+    let categoriaSeleccionada = "";
     let accionPendiente = null;
 
     async function cargarDatos() {
@@ -325,8 +368,8 @@
     }
 
     function poblarCategorias(data) {
-      const select = document.getElementById('selectCategoria');
-      select.innerHTML = '<option value="">Todas las categorías</option>';
+      const container = document.getElementById('chipsContainer');
+      container.innerHTML = '<div class="chip active" onclick="seleccionarCategoria(\'\', this)">Todas</div>';
       
       const categorias = [...new Set(data.map(item => item.categoria ? item.categoria.toString().trim() : ""))];
       let contieneSinCategoria = false;
@@ -335,13 +378,20 @@
         if (cat === "") {
           contieneSinCategoria = true;
         } else {
-          select.innerHTML += `<option value="${cat}">${cat}</option>`;
+          container.innerHTML += `<div class="chip" onclick="seleccionarCategoria('${cat}', this)">${cat}</div>`;
         }
       });
 
       if (contieneSinCategoria) {
-        select.innerHTML += `<option value="SIN_CATEGORIA">Sin Categoría</option>`;
+        container.innerHTML += `<div class="chip" onclick="seleccionarCategoria('SIN_CATEGORIA', this)">Sin Categoría</div>`;
       }
+    }
+
+    function seleccionarCategoria(cat, elemento) {
+      categoriaSeleccionada = cat;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      elemento.classList.add('active');
+      aplicarFiltros();
     }
 
     function renderizarLista(data) {
@@ -360,18 +410,19 @@
         const catTexto = tieneCategoria ? item.categoria : "Sin Categoría";
 
         const div = document.createElement('div');
-        // Pinta VERDE solo si se guardó Stock Físico
-        div.className = `product-item ${tieneStockGuardado ? 'stock-guardado' : ''}`;
+        div.className = `product-card ${tieneStockGuardado ? 'stock-guardado' : ''}`;
         div.id = `item-${item.fila}`;
 
         div.innerHTML = `
-          <div class="product-header" onclick="toggleAcordeon(${item.fila})">
-            <div class="toggle-icon" id="icon-${item.fila}">▼</div>
-            <div class="header-info">
-              <span class="lbl">Producto:</span>
-              <span class="val">${item.producto}</span>
-              <span class="badge-manojo" id="badge-${item.fila}" style="display: ${verificadoManojo ? 'inline-block' : 'none'};">Manojo</span>
+          <div class="card-main" onclick="toggleAcordeon(${item.fila})">
+            <div class="card-left">
+              <div class="icon-circle">📦</div>
+              <div>
+                <span class="product-name">${item.producto}</span>
+                <span class="badge-manojo" id="badge-${item.fila}" style="display: ${verificadoManojo ? 'inline-block' : 'none'};">Manojo</span>
+              </div>
             </div>
+            <div class="toggle-arrow" id="icon-${item.fila}">▼</div>
           </div>
 
           <div class="product-details" id="details-${item.fila}">
@@ -389,10 +440,10 @@
             </div>
             <div class="detail-row">
               <span class="detail-label">Variación:</span>
-              <span class="detail-value" id="var-${item.fila}" style="font-weight:bold; color:var(--primary-blue);">${item.variacion}</span>
+              <span class="detail-value" id="var-${item.fila}" style="color:var(--accent-blue);">${item.variacion}</span>
             </div>
 
-            <!-- Entrada de Stock Físico con Botón -->
+            <!-- Entrada Stock Físico -->
             <div class="stock-input-group">
               <span class="detail-label">Stock Físico:</span>
               <input type="number" id="input-stock-${item.fila}" value="${item.stockAlmacen !== '' ? item.stockAlmacen : ''}" placeholder="0">
@@ -420,7 +471,6 @@
 
     function aplicarFiltros() {
       const texto = document.getElementById('txtBuscar').value.toLowerCase().trim();
-      const categoriaSel = document.getElementById('selectCategoria').value;
 
       const filtrados = productosGlobales.filter(item => {
         const coincideTexto = (item.producto && item.producto.toLowerCase().includes(texto)) || 
@@ -429,12 +479,12 @@
         const catVal = item.categoria ? item.categoria.toString().trim() : "";
         let coincideCategoria = false;
 
-        if (categoriaSel === "") {
+        if (categoriaSeleccionada === "") {
           coincideCategoria = true;
-        } else if (categoriaSel === "SIN_CATEGORIA") {
+        } else if (categoriaSeleccionada === "SIN_CATEGORIA") {
           coincideCategoria = (catVal === "");
         } else {
-          coincideCategoria = (catVal === categoriaSel);
+          coincideCategoria = (catVal === categoriaSeleccionada);
         }
 
         return coincideTexto && coincideCategoria;
@@ -459,13 +509,14 @@
       }
     }
 
+    /* Mostrar Toast Centrado */
     function mostrarToast() {
       const toast = document.getElementById('toastNotification');
       toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
-    /* Acciones con Confirmación y Toast */
+    /* Handlers de Acción */
     function pedirConfirmacionStock(fila, nombre) {
       const cantidad = document.getElementById(`input-stock-${fila}`).value;
       if (cantidad === '') return;
@@ -482,7 +533,6 @@
             const data = await res.json();
             if (data.status === 'ok') {
               document.getElementById(`var-${fila}`).innerText = data.variacion;
-              // PINTAR DE VERDE ÚNICAMENTE AL GUARDAR STOCK FÍSICO
               document.getElementById(`item-${fila}`).classList.add('stock-guardado');
               mostrarToast();
             }
@@ -493,7 +543,7 @@
 
     function pedirConfirmacionVerificacion(checkbox, fila, nombre) {
       const checked = checkbox.checked;
-      checkbox.checked = !checked; // revertir mientras se confirma
+      checkbox.checked = !checked;
 
       const mensaje = checked 
         ? `¿Confirmas marcar como verificado el producto:<br>"<b>${nombre}</b>"?` 
@@ -507,7 +557,6 @@
             checkbox.checked = checked;
             const badge = document.getElementById(`badge-${fila}`);
 
-            // Mostrar/Ocultar etiqueta roja Manojo (SIN CAMBIAR EL COLOR VERDE DE LA TARJETA)
             if (checked) {
               badge.style.display = 'inline-block';
             } else {
