@@ -281,7 +281,6 @@
     }
     input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-blue); }
 
-    /* Botón Flotante para crear nuevo */
     .fab-new-product {
       position: fixed;
       bottom: 20px;
@@ -302,7 +301,6 @@
       text-transform: uppercase;
     }
 
-    /* Modal Formulario */
     .form-group {
       text-align: left;
       margin-bottom: 12px;
@@ -324,7 +322,6 @@
       outline: none;
     }
 
-    /* Modal Generico */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -406,7 +403,6 @@
     Cargando inventario...
   </div>
 
-  <!-- Botón para registrar un producto nuevo -->
   <button class="fab-new-product" onclick="abrirModalNuevoProducto()">+ NUEVO PRODUCTO</button>
 
   <!-- Modal de Registro de Producto -->
@@ -414,16 +410,17 @@
     <div class="modal-card">
       <div class="modal-title">REGISTRAR NUEVO</div>
       <div class="form-group">
-        <label>Código Barcode:</label>
-        <input type="text" id="newCodigo" placeholder="Ej. 9810906008007">
-      </div>
-      <div class="form-group">
-        <label>Nombre del Producto:</label>
+        <label>Nombre del Producto (*):</label>
         <input type="text" id="newNombre" placeholder="Ej. CAPA ALGODÓN ROJA">
       </div>
       <div class="form-group">
+        <label>Código Barcode (Opcional):</label>
+        <input type="text" id="newCodigo" placeholder="Ej. 9810906008007">
+      </div>
+      <div class="form-group">
         <label>Categoría:</label>
-        <input type="text" id="newCategoria" placeholder="Ej. CAPA ALGODÓN">
+        <input type="text" id="newCategoria" list="listaCategoriasExistentes" placeholder="Escribe o selecciona..." autocomplete="off">
+        <datalist id="listaCategoriasExistentes"></datalist>
       </div>
       <div class="form-group">
         <label>Stock Físico Encontrado:</label>
@@ -470,8 +467,11 @@
 
     function poblarCategorias(data) {
       const container = document.getElementById('chipsContainer');
-      container.innerHTML = '<div class="chip active" onclick="seleccionarCategoria(\'\', this)">TODAS</div>';
+      const datalist = document.getElementById('listaCategoriasExistentes');
       
+      container.innerHTML = '<div class="chip active" onclick="seleccionarCategoria(\'\', this)">TODAS</div>';
+      datalist.innerHTML = '';
+
       const categorias = [...new Set(data.map(item => item.categoria ? item.categoria.toString().trim() : ""))];
       let contieneSinCategoria = false;
 
@@ -479,7 +479,10 @@
         if (cat === "") {
           contieneSinCategoria = true;
         } else {
+          // Chips de arriba
           container.innerHTML += `<div class="chip" onclick="seleccionarCategoria('${cat}', this)">${cat.toUpperCase()}</div>`;
+          // Opciones autocompletables para el modal
+          datalist.innerHTML += `<option value="${cat.toUpperCase()}">`;
         }
       });
 
@@ -512,6 +515,7 @@
         const tieneStockGuardado = item.stockAlmacen !== "" && item.stockAlmacen !== null && item.stockAlmacen !== undefined;
         const tieneCategoria = item.categoria && item.categoria.toString().trim() !== "";
         const catTexto = tieneCategoria ? item.categoria.toUpperCase() : "SIN CATEGORÍA";
+        const codigoTexto = item.codigo ? item.codigo : "—";
 
         const div = document.createElement('div');
         div.className = `product-card ${tieneStockGuardado ? 'stock-guardado' : ''}`;
@@ -534,7 +538,7 @@
           <div class="product-details" id="details-${item.fila}">
             <div class="detail-row">
               <span class="detail-label">Código:</span>
-              <span class="detail-value">${item.codigo}</span>
+              <span class="detail-value">${codigoTexto}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Categoría:</span>
@@ -709,8 +713,8 @@
       const categoria = document.getElementById('newCategoria').value.trim();
       const stockFisico = document.getElementById('newStock').value;
 
-      if (!codigo || !producto) {
-        alert("El código y nombre del producto son requeridos.");
+      if (!producto) {
+        alert("El nombre del producto es obligatorio.");
         return;
       }
 
@@ -729,6 +733,12 @@
 
       const data = await res.json();
       if (data.status === 'ok') {
+        // Limpiar formulario
+        document.getElementById('newCodigo').value = "";
+        document.getElementById('newNombre').value = "";
+        document.getElementById('newCategoria').value = "";
+        document.getElementById('newStock').value = "";
+
         mostrarToast();
         cargarDatos();
       }
