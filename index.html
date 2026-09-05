@@ -22,13 +22,12 @@
       padding: 16px;
     }
 
-    /* Header Nav */
     .breadcrumb { font-size: 0.8em; color: var(--text-muted); margin-bottom: 4px; }
     .breadcrumb span { color: var(--primary-blue); }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .header h1 { font-size: 1.6em; margin: 0; display: flex; align-items: center; gap: 10px; }
+    .header h1 { font-size: 1.6em; margin: 0; }
 
-    /* Filtros estilo la imagen */
+    /* Filtros */
     .filter-card {
       background: #fff;
       padding: 16px;
@@ -66,7 +65,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* Lista e Ítems Acordeón */
+    /* Lista Acordeón */
     .product-list { display: flex; flex-direction: column; gap: 10px; }
 
     .product-item {
@@ -74,6 +73,7 @@
       border-radius: 10px;
       border: 1px solid var(--border-color);
       overflow: hidden;
+      transition: all 0.3s ease;
     }
 
     .product-item.contabilizado {
@@ -109,7 +109,6 @@
     .header-info .lbl { font-weight: bold; }
     .header-info .val { color: var(--primary-blue); font-weight: 600; }
 
-    /* Detalle Desplegable */
     .product-details {
       display: none;
       padding: 0 16px 16px 56px;
@@ -129,12 +128,25 @@
     .detail-label { color: var(--text-muted); font-weight: 600; }
     .detail-value { font-weight: 500; text-align: right; }
 
-    /* Formulario dentro del item */
-    .stock-input-container {
+    /* Grupo de Entrada para Stock Físico con Botón */
+    .stock-input-group {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
+    }
+
+    .stock-input-group input { width: 80px; text-align: center; }
+
+    .btn-save-stock {
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.85em;
+      cursor: pointer;
     }
 
     .checkbox-action {
@@ -147,6 +159,58 @@
     }
 
     input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary-blue); }
+
+    /* Modal Interactivo Centrado */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: popup 0.25s ease-out;
+    }
+
+    @keyframes popup {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-icon {
+      width: 50px; height: 50px;
+      background: #e6f3ff; color: var(--primary-blue);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5em; margin: 0 auto 12px auto;
+    }
+
+    .modal-title { font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
+    .modal-body { color: var(--text-muted); font-size: 0.9em; margin-bottom: 20px; line-height: 1.4; }
+    .modal-body b { color: var(--text-main); }
+
+    .modal-actions { display: flex; gap: 10px; }
+    
+    .btn-modal {
+      flex: 1; padding: 10px; border-radius: 8px;
+      font-weight: bold; border: none; cursor: pointer;
+    }
+    
+    .btn-confirm { background: var(--primary-blue); color: white; }
+    .btn-cancel { background: #e4e8ee; color: var(--text-main); }
   </style>
 </head>
 <body>
@@ -157,7 +221,7 @@
     <span style="font-size: 1.2em; color: var(--primary-blue);">🔍</span>
   </div>
 
-  <!-- Panel de Filtros -->
+  <!-- Filtros -->
   <div class="filter-card">
     <div class="form-group">
       <label>Buscar Producto o Código</label>
@@ -174,16 +238,30 @@
     <button class="btn-primary" onclick="aplicarFiltros()">CONFIRMAR FILTRO</button>
   </div>
 
-  <!-- Contenedor del Inventario -->
+  <!-- Lista -->
   <div class="product-list" id="listaProductos">
     Cargando inventario...
   </div>
 
+  <!-- Modal Interactivo Personaizadado -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-icon">📦</div>
+      <div class="modal-title" id="modalTitle">Confirmar Acción</div>
+      <div class="modal-body" id="modalBody">Mensaje de confirmación</div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-cancel" onclick="cerrarModal(false)">Cancelar</button>
+        <button class="btn-modal btn-confirm" onclick="cerrarModal(true)">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // REEMPLAZA CON TU URL DE DESPLIEGUE DE APPS SCRIPT
+    // PEGA AQUÍ TU URL DE APPS SCRIPT
     const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
     
     let productosGlobales = [];
+    let accionPendiente = null;
 
     async function cargarDatos() {
       try {
@@ -247,16 +325,16 @@
               <span class="detail-value" id="var-${item.fila}" style="font-weight:bold; color:var(--primary-blue);">${item.variacion}</span>
             </div>
 
-            <!-- Formulario interactivo -->
-            <div class="stock-input-container">
+            <!-- Entrada de Stock con Botón Guardar -->
+            <div class="stock-input-group">
               <span class="detail-label">Stock Físico:</span>
-              <input type="number" value="${item.stockAlmacen !== '' ? item.stockAlmacen : ''}" 
-                placeholder="0" onchange="guardarStock(${item.fila}, this.value, '${item.producto}')">
+              <input type="number" id="input-stock-${item.fila}" value="${item.stockAlmacen !== '' ? item.stockAlmacen : ''}" placeholder="0">
+              <button class="btn-save-stock" onclick="pedirConfirmacionStock(${item.fila}, '${item.producto}')">Guardar</button>
             </div>
 
             <div class="checkbox-action">
-              <input type="checkbox" ${verificado ? 'checked' : ''} 
-                onchange="confirmarVerificacion(this, ${item.fila}, '${item.producto}')">
+              <input type="checkbox" id="chk-${item.fila}" ${verificado ? 'checked' : ''} 
+                onclick="pedirConfirmacionVerificacion(this, ${item.fila}, '${item.producto}')">
               <span>Manojo (Contabilizado)</span>
             </div>
           </div>
@@ -286,43 +364,75 @@
       renderizarLista(filtrados);
     }
 
-    async function guardarStock(fila, cantidad, nombre) {
+    /* Lógica del Modal */
+    function abrirModal(titulo, cuerpo, callback) {
+      document.getElementById('modalTitle').innerText = titulo;
+      document.getElementById('modalBody').innerHTML = cuerpo;
+      document.getElementById('modalOverlay').classList.add('active');
+      accionPendiente = callback;
+    }
+
+    function cerrarModal(confirmado) {
+      document.getElementById('modalOverlay').classList.remove('active');
+      if (accionPendiente) {
+        accionPendiente(confirmado);
+        accionPendiente = null;
+      }
+    }
+
+    /* Handlers con Modal y Botón */
+    function pedirConfirmacionStock(fila, nombre) {
+      const cantidad = document.getElementById(`input-stock-${fila}`).value;
       if (cantidad === '') return;
-      if (!confirm(`¿Confirmas ingresar ${cantidad} unidades para:\n"${nombre}"?`)) return;
 
-      const res = await fetch(URL_API, {
-        method: 'POST',
-        body: JSON.stringify({ accion: "ACTUALIZAR_STOCK", fila: fila, stockAlmacen: cantidad })
-      });
-      const data = await res.json();
-      if (data.status === 'ok') {
-        document.getElementById(`var-${fila}`).innerText = data.variacion;
-      }
+      abrirModal(
+        "Confirmar Ingreso",
+        `¿Deseas ingresar <b>${cantidad}</b> unidades para el producto:<br>"<b>${nombre}</b>"?`,
+        async (confirmado) => {
+          if (confirmado) {
+            const res = await fetch(URL_API, {
+              method: 'POST',
+              body: JSON.stringify({ accion: "ACTUALIZAR_STOCK", fila: fila, stockAlmacen: cantidad })
+            });
+            const data = await res.json();
+            if (data.status === 'ok') {
+              document.getElementById(`var-${fila}`).innerText = data.variacion;
+            }
+          }
+        }
+      );
     }
 
-    async function confirmarVerificacion(checkbox, fila, nombre) {
+    function pedirConfirmacionVerificacion(checkbox, fila, nombre) {
       const checked = checkbox.checked;
-      const mensaje = checked ? `¿Confirmas marcar como verificado:\n"${nombre}"?` : `¿Deseas desmarcar:\n"${nombre}"?`;
+      checkbox.checked = !checked; // revertir temporalmente mientras confirma
 
-      if (!confirm(mensaje)) {
-        checkbox.checked = !checked;
-        return;
-      }
+      const mensaje = checked 
+        ? `¿Confirmas marcar como verificado el producto:<br>"<b>${nombre}</b>"?` 
+        : `¿Deseas desmarcar el producto:<br>"<b>${nombre}</b>"?`;
 
-      const itemCard = document.getElementById(`item-${fila}`);
-      if (checked) {
-        itemCard.classList.add('contabilizado');
-      } else {
-        itemCard.classList.remove('contabilizado');
-      }
+      abrirModal(
+        "Verificación de Producto",
+        mensaje,
+        async (confirmado) => {
+          if (confirmado) {
+            checkbox.checked = checked;
+            const itemCard = document.getElementById(`item-${fila}`);
+            if (checked) {
+              itemCard.classList.add('contabilizado');
+            } else {
+              itemCard.classList.remove('contabilizado');
+            }
 
-      await fetch(URL_API, {
-        method: 'POST',
-        body: JSON.stringify({ accion: "VERIFICAR", fila: fila, manojo: checked })
-      });
+            await fetch(URL_API, {
+              method: 'POST',
+              body: JSON.stringify({ accion: "VERIFICAR", fila: fila, manojo: checked })
+            });
+          }
+        }
+      );
     }
 
-    // Inicializar
     cargarDatos();
   </script>
 </body>
