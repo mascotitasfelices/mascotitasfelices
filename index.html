@@ -11,10 +11,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mascotitas">
-  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp">
 
-  <!-- Manifest generado en línea para permitir la instalación -->
-  <link rel="manifest" href='data:application/json,{"name":"Mascotitas Felices Inventario","short_name":"Mascotitas","start_url":".","display":"standalone","background_color":"#f4f7f9","theme_color":"#0f172a","icons":[{"src":"https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp","sizes":"512x512","type":"image/png"}]}'>
+  <!-- Logo de Google Drive convertido a enlace directo de renderizado directo -->
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512">
+
+  <!-- Manifest generado para permitir la instalación -->
+  <link rel="manifest" href='data:application/json,{"name":"Mascotitas Felices Inventario","short_name":"Mascotitas","start_url":".","display":"standalone","background_color":"#f4f7f9","theme_color":"#0f172a","icons":[{"src":"https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512","sizes":"512x512","type":"image/png"}]}'>
 
   <style>
     :root {
@@ -42,7 +44,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Header Profesional con Logo de Google Drive */
+    /* Header Profesional con Logo */
     .header-brand {
       background: var(--card-bg);
       border-radius: 20px;
@@ -56,8 +58,8 @@
     }
 
     .logo-container {
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       border-radius: 14px;
       overflow: hidden;
       background: #fff;
@@ -115,7 +117,7 @@
       font-weight: 500;
     }
 
-    /* Chips de Categorías */
+    /* Categorías */
     .chips-container {
       display: flex;
       gap: 8px;
@@ -354,10 +356,10 @@
 </head>
 <body>
 
-  <!-- Header con Logo directo desde Google Drive -->
+  <!-- Header con enlace procesado directo de Google Drive -->
   <div class="header-brand">
     <div class="logo-container">
-      <img src="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp" alt="Mascotitas Felices">
+      <img src="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp=s512" alt="Mascotitas Felices" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616408.png'">
     </div>
     <div class="header-titles">
       <span class="company-name">Mascotitas Felices</span>
@@ -401,7 +403,6 @@
   </div>
 
   <script>
-    // Tu URL oficial de Apps Script vinculada
     const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
     
     let productosGlobales = [];
@@ -621,7 +622,7 @@
       );
     }
 
-    // Registro de Service Worker para habilitar PWA
+    // Registro de Service Worker para PWA
     if ('serviceWorker' in navigator) {
       const swCode = `self.addEventListener('fetch', function(e) {});`;
       const blob = new Blob([swCode], { type: 'application/javascript' });
