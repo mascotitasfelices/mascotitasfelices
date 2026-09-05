@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ajuste de Inventario - Mascotitas Felices</title>
+  
+  <!-- Configuración PWA para instalación en celulares -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mascotitas">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp">
+
+  <!-- Manifest generado en línea para permitir la instalación -->
+  <link rel="manifest" href='data:application/json,{"name":"Mascotitas Felices Inventario","short_name":"Mascotitas","start_url":".","display":"standalone","background_color":"#f4f7f9","theme_color":"#0f172a","icons":[{"src":"https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp","sizes":"512x512","type":"image/png"}]}'>
+
   <style>
     :root {
       --bg-main: #f4f7f9;
@@ -30,7 +42,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Header Profesional con Logo Integrado */
+    /* Header Profesional con Logo de Google Drive */
     .header-brand {
       background: var(--card-bg);
       border-radius: 20px;
@@ -103,7 +115,7 @@
       font-weight: 500;
     }
 
-    /* Chips de Categorías (SÚPER MAYÚSCULAS) */
+    /* Chips de Categorías */
     .chips-container {
       display: flex;
       gap: 8px;
@@ -148,7 +160,6 @@
       transition: all 0.25s ease;
     }
 
-    /* Pinta de verde al guardar Stock Físico */
     .product-card.stock-guardado {
       background-color: var(--stock-green-bg) !important;
       border: 1.5px solid var(--stock-green-border);
@@ -209,7 +220,6 @@
     }
     .toggle-arrow.open { transform: rotate(180deg); }
 
-    /* Detalles Desplegables */
     .product-details {
       display: none;
       margin-top: 12px;
@@ -227,7 +237,6 @@
     .detail-label { color: var(--text-muted); font-weight: 600; }
     .detail-value { font-weight: 700; color: var(--text-dark); }
 
-    /* Input Stock Físico */
     .stock-input-group {
       display: flex;
       align-items: center;
@@ -268,7 +277,7 @@
     }
     input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-blue); }
 
-    /* Modal de Confirmación Centrado */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -311,7 +320,7 @@
     .btn-confirm { background: var(--accent-blue); color: white; }
     .btn-cancel { background: #f1f5f9; color: var(--text-dark); }
 
-    /* Alerta Toast "Guardado con éxito" - CENTRADA EN PANTALLA */
+    /* Toast Centrado */
     .toast-notification {
       position: fixed;
       top: 50%;
@@ -345,11 +354,10 @@
 </head>
 <body>
 
-  <!-- Header Profesional con Logo Integrado -->
+  <!-- Header con Logo directo desde Google Drive -->
   <div class="header-brand">
     <div class="logo-container">
-      <!-- Reemplaza el src si deseas usar un enlace directo de Drive/Imgur -->
-      <img src="https://drive.google.com/file/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp/view?usp=sharing">
+      <img src="https://lh3.googleusercontent.com/d/1yfiRwqjGZ5TYr5iwaxRiKaDv-7tT7Mgp" alt="Mascotitas Felices">
     </div>
     <div class="header-titles">
       <span class="company-name">Mascotitas Felices</span>
@@ -364,7 +372,7 @@
     </div>
   </div>
 
-  <!-- Chips de Categorías en MAYÚSCULAS -->
+  <!-- Categorías -->
   <div class="chips-container" id="chipsContainer">
     <div class="chip active" onclick="seleccionarCategoria('', this)">TODAS</div>
   </div>
@@ -374,7 +382,7 @@
     Cargando inventario...
   </div>
 
-  <!-- Modal Interactivo -->
+  <!-- Modal -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-card">
       <div class="modal-icon">📦</div>
@@ -387,13 +395,13 @@
     </div>
   </div>
 
-  <!-- Mensaje Flotante Guardado (Centrado) -->
+  <!-- Toast -->
   <div class="toast-notification" id="toastNotification">
     ✓ GUARDADO CON ÉXITO
   </div>
 
   <script>
-    // PEGA AQUÍ TU URL DE DESPLIEGUE DE APPS SCRIPT
+    // Tu URL oficial de Apps Script vinculada
     const URL_API = "https://script.google.com/macros/s/AKfycbwehpyLrQPJvJZRoq6yciRxPnwFWRQWgvebdFXdzOj2NZiTOjEhJdkgLAkkHhB7mnMffQ/exec"; 
     
     let productosGlobales = [];
@@ -487,14 +495,12 @@
               <span class="detail-value" id="var-${item.fila}" style="color:var(--accent-blue);">${item.variacion}</span>
             </div>
 
-            <!-- Entrada Stock Físico -->
             <div class="stock-input-group">
               <span class="detail-label">Stock Físico:</span>
               <input type="number" id="input-stock-${item.fila}" value="${item.stockAlmacen !== '' ? item.stockAlmacen : ''}" placeholder="0">
               <button class="btn-save-stock" onclick="pedirConfirmacionStock(${item.fila}, '${item.producto}')">GUARDAR</button>
             </div>
 
-            <!-- Checkbox Manojo -->
             <div class="checkbox-action">
               <input type="checkbox" id="chk-${item.fila}" ${verificadoManojo ? 'checked' : ''} 
                 onclick="pedirConfirmacionVerificacion(this, ${item.fila}, '${item.producto}')">
@@ -537,7 +543,6 @@
       renderizarLista(filtrados);
     }
 
-    /* Modal Interactivo */
     function abrirModal(titulo, cuerpo, callback) {
       document.getElementById('modalTitle').innerText = titulo;
       document.getElementById('modalBody').innerHTML = cuerpo;
@@ -553,14 +558,12 @@
       }
     }
 
-    /* Toast Centrado */
     function mostrarToast() {
       const toast = document.getElementById('toastNotification');
       toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
-    /* Acciones */
     function pedirConfirmacionStock(fila, nombre) {
       const cantidad = document.getElementById(`input-stock-${fila}`).value;
       if (cantidad === '') return;
@@ -616,6 +619,13 @@
           }
         }
       );
+    }
+
+    // Registro de Service Worker para habilitar PWA
+    if ('serviceWorker' in navigator) {
+      const swCode = `self.addEventListener('fetch', function(e) {});`;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
     }
 
     cargarDatos();
